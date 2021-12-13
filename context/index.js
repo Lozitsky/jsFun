@@ -1,4 +1,7 @@
+const globalWindowObject = 'global window object';
+
 const context = {
+
   exerciseA() {
     const fly = () => {
       console.log(this);
@@ -16,11 +19,13 @@ const context = {
 
 
     // What is the value of `this` when we call ship.fly()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = globalWindowObject;
+
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // In arrow functions, this retains the value of the enclosing lexical context's this.
+    // In global code, it will be set to the global object:
   },
 
   exerciseB() {
@@ -30,17 +35,20 @@ const context = {
     }
 
     // What is the value of `this` when we call fn()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    // console.log('B', fn());
+    // console.log('B value set by call', fn.call({value: 2}));
+    const result = globalWindowObject;
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Since the following code is not in strict mode, and because the value of this
+    // is not set by the call, this will default to the global object, which is window in a browser.
   },
 
   exerciseC() {
     const car = {
       make: 'Tesla',
-      getInfo: function(){
+      getInfo: function () {
         console.log(this);
       }
     };
@@ -49,19 +57,20 @@ const context = {
     el.addEventListener('click', car.getInfo);
 
     // What is the value of `this` when a user clicks on our element and car.getInfo() is triggered?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    // console.log(car.getInfo());
+    const result = 'el';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    //  When a function is used as an event handler,
+    //  its this is set to the element on which the listener is placed
   },
 
   exerciseD() {
     const dog = {
       breed: 'Chihuahua',
-      getBreed: function(){
-
-        const innerFunction = function() {
+      getBreed: function () {
+        const innerFunction = function () {
           console.log(this.breed);
         };
 
@@ -70,13 +79,15 @@ const context = {
     };
 
     var breed = dog.getBreed();
-
+    // console.log(breed());
     // What is the value of `this` when we call breed()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = globalWindowObject;
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // The breed() is a function in the global context, not in the dog object context.
+    // this.breed can access to breed value only inside the dog object.
+    // But in this case, this.breed points to a global object.
   },
 
   exerciseE() {
@@ -88,11 +99,12 @@ const context = {
 
 
     // What is the value of `this` when we call fn()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = globalWindowObject;
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // In arrow functions, this retains the value of the enclosing lexical context's this.
+    // In global code, it will be set to the global object
   },
 
   exerciseF() {
@@ -111,11 +123,12 @@ const context = {
     const storm = new Hero('Ororo', 'weather control', true);
 
     // What is the value of `this` when we call storm.identifyHero()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'instance of Hero';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // When a function is used as a constructor (with the new keyword),
+    // its this is bound to the new object being constructed.
   },
 
   exerciseG() {
@@ -129,7 +142,7 @@ const context = {
       }
 
       restart() {
-        setTimeout(function() {
+        setTimeout(function () {
           console.log(`Restarting ${this.title}...`);
         }, 1000);
       }
@@ -139,17 +152,19 @@ const context = {
 
 
     // What is the value of `this` when we call monopoly.restart()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = globalWindowObject;
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Code executed by setTimeout() is run in a separate execution context to the function from which it was called.
+    // As a consequence, the this keyword for the called function will be set to the window (or global) object;
+    // it will not be the same as the this value for the function that called setTimeout
   },
 
   exerciseH() {
     const obj = {
       arrowFunction: null,
-      method: function() {
+      method: function () {
         this.arrowFunction = () => {
           return this;
         };
@@ -157,13 +172,15 @@ const context = {
     };
 
     obj.method();
-
+    // console.log(obj.arrowFunction());
     // What is the value of `this` when we call obj.arrowFunction()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'obj';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    //  When a function is called as a method of an object,
+    // its this is set to the object the method is called on.
+    //  In arrow functions, this retains the value of the enclosing lexical context's this.
   },
 
   exerciseI() {
@@ -177,66 +194,73 @@ const context = {
       name: 'Audre'
     }];
 
-    poets.map(function(poet) {
+    poets.map(function (poet) {
       return this;
     }, poets);
 
     // What is the value of `this` that gets returned on each iteration of poets.map()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'poets';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment. Annotation should include explanation regarding the second argument of `poets` that is being passed
+    // map(function(element, index, array) { /* ... */ }, thisArg)
+    //  callbackFn: function that is called for every element of arr.
+    // Each time callbackFn executes, the returned value is added to newArray.
+    //  thisArg Optional: value to use as this when executing callbackFn.
   },
 
   exerciseJ() {
     const el = $('#btn');
-    el.on('click', function() {
+    el.on('click', function () {
       console.log($(this));
     });
 
     // What is the value of `this` when a user clicks on our #btn element and the callback is triggered?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'el';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment.
+    // $(this) is a jQuery wrapper around that element that enables usage of jQuery methods.
+    // jQuery calls the callback using apply() to bind this.
   },
 
   exerciseK() {
     var store = {
       fruit: 'grapes',
-      sellMe: function() {
+      sellMe: function () {
         return this.fruit;
       }
     };
 
     // What is the value of `this` when we call store.sellMe()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'store';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment.
+    // When a function is called as a method of an object,
+    // its this is set to the object the method is called on.
   },
 
   exerciseL() {
     const dog = {
       breed: 'Chihuahua',
-      getBreed: function(){
+      getBreed: function () {
         var _this = this;
 
-        setTimeout(function() {
+        setTimeout(function () {
           console.log('Your dog is a ' + _this.breed);
         });
       }
     };
 
     // What is the value of `this` when we call dog.getBreed()?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    // console.log(dog.getBreed());
+    const result = 'dog';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    //  In this case, we referenced a specific object
+    // when we created a variable _this that references this.
   },
 
   exerciseM() {
@@ -255,11 +279,11 @@ const context = {
     }
 
     // What is the value of `this` when we call makeBirdNoise.call(robert);
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'robert';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // // An object can be passed as the first argument to call or apply and this will be bound to it.
   },
 
   exerciseN() {
@@ -281,11 +305,14 @@ const context = {
     var firstBird = new Bird('Calvin', 'budgie');
 
     // What is the value of `this` when we call firstBird.delayNoise();
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = 'instance of Bird';
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    //  Calling f.bind(someObject) creates a new function with the same body and scope as f,
+    // but where this occurs in the original function,
+    // in the new function it is permanently bound to the first argument of bind,
+    // regardless of how the function is being used.
   },
 
   exerciseO() {
@@ -297,27 +324,34 @@ const context = {
     });
 
     // What is the value of `this` when a user clicks on our button element and the callback is triggered?
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+
+    const result = globalWindowObject;
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    //    When attaching a handler function to an element using addEventListener(),
+    //  the value of this inside the handler will be a reference to the element.
+    //  It will be the same as the value of the currentTarget property of the event argument
+    //  that is passed to the handler.
+    //    But arrow functions do not have their own this context.
   },
 
   exerciseP() {
     const child = {
-      totalScreams : 4,
+      totalScreams: 4,
       scream: () => {
         this.totalScreams++;
       }
     };
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = globalWindowObject;
     return result;
 
     // What is the value of `this` when we call child.scream();
     // Annotation:
-    // Write your annotation here as a comment
+    //  When a function is called as a method of an object,
+    // its this is set to the object the method is called on.
+    //  But arrow functions do not have their own this context.
   }
 };
 
