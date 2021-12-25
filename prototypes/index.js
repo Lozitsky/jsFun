@@ -1,21 +1,17 @@
-const { kitties } = require('./datasets/kitties');
-const { clubs } = require('./datasets/clubs');
-const { mods } = require('./datasets/mods');
-const { cakes } = require('./datasets/cakes');
-const { classrooms } = require('./datasets/classrooms');
-const { breweries } = require('./datasets/breweries');
-const { nationalParks } = require('./datasets/nationalParks');
-const { books } = require('./datasets/books');
-const { weather } = require('./datasets/weather');
-const { instructors, cohorts } = require('./datasets/turing');
-const { bosses, sidekicks } = require('./datasets/bosses');
-const { constellations, stars } = require('./datasets/astronomy');
-const { weapons, characters } = require('./datasets/ultima');
-const { dinosaurs, humans, movies } = require('./datasets/dinosaurs');
-
-
-
-
+const {kitties} = require('./datasets/kitties');
+const {clubs} = require('./datasets/clubs');
+const {mods} = require('./datasets/mods');
+const {cakes} = require('./datasets/cakes');
+const {classrooms} = require('./datasets/classrooms');
+const {breweries} = require('./datasets/breweries');
+const {nationalParks} = require('./datasets/nationalParks');
+const {books} = require('./datasets/books');
+const {weather} = require('./datasets/weather');
+const {instructors, cohorts} = require('./datasets/turing');
+const {bosses, sidekicks} = require('./datasets/bosses');
+const {constellations, stars} = require('./datasets/astronomy');
+const {weapons, characters} = require('./datasets/ultima');
+const {dinosaurs, humans, movies} = require('./datasets/dinosaurs');
 
 
 // SINGLE DATASETS
@@ -27,21 +23,26 @@ const kittyPrompts = {
 
     // Return an array of just the names of kitties who are orange e.g.
     // ['Tiger', 'Snickers']
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = kitties.filter(kitty => kitty.color === 'orange').map(orangeKitty => orangeKitty.name);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // getting in an array of object with name, age and color properties.
+    // want to get back an array of only the orange cat's names.
+    // reach for a filter to get back orange cats (want a subset of the original data).
+    // only want the names of the cats.
+    // reach for a map
+    //  map over the filtered cats and get back their name property.
   },
 
   sortByAge() {
     // Sort the kitties by their age
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = kitties.sort((a, b) => b.age - a.age);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // getting in a sorted array of object in reverse order
   },
 
   growUp() {
@@ -58,25 +59,18 @@ const kittyPrompts = {
     // },
     // ...etc]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = kitties.map(kitty => {
+      kitty.age += 2;
+      return kitty;
+    });
     return result;
   }
 };
 
 
-
-
-
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-
-
-
+// getting in an array of object with age+2
+// reach for a map
+// map get back an array of cats with increased age
 
 
 // DATASET: clubs from ./datasets/clubs
@@ -90,28 +84,28 @@ const clubPrompts = {
     //   ...etc
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
-    return result;
-
+    return clubs.reduce((newObj, obj) => {
+      obj.members.reduce((acc, member) => {
+        if (!acc[member]) {
+          acc[member] = [];
+        }
+        acc[member].push(obj.club);
+        return acc;
+      }, newObj);
+      return newObj;
+    }, {});
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function twice for the array traversing only once.
+
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: mods from ./datasets/mods
@@ -126,28 +120,27 @@ const modPrompts = {
     //   { mod: 4, studentsPerInstructor: 8 }
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = mods.reduce((acc, obj) => {
+      const object = {};
+      object.mod = obj.mod;
+      object.studentsPerInstructor = obj.students / obj.instructors;
+      acc.push(object);
+      return acc;
+    }, []);
+
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: cakes from ./datasets/cakes
@@ -161,11 +154,17 @@ const cakePrompts = {
     //    ..etc
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = cakes.reduce((acc, obj) => {
+      const newObj = {};
+      newObj.flavor = obj.cakeFlavor;
+      newObj.inStock = obj.inStock;
+      acc.push(newObj);
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   onlyInStock() {
@@ -189,22 +188,22 @@ const cakePrompts = {
     // ..etc
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = cakes.filter(cake => cake.inStock);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the filter function to filter the array;
   },
 
   totalInventory() {
     // Return the total amount of cakes in stock e.g.
     // 59
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = cakes.reduce((sum, cake) => sum + cake.inStock, 0);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing and concat the amount
   },
 
   allToppings() {
@@ -212,11 +211,20 @@ const cakePrompts = {
     // every cake in the dataset e.g.
     // ['dutch process cocoa', 'toasted sugar', 'smoked sea salt', 'berries', ..etc]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = cakes.reduce((acc, cake) => {
+      cake.toppings.reduce((acc, topping) => {
+        if (acc.indexOf(topping) === -1) {
+          acc.push(topping);
+        }
+        return acc;
+      }, acc);
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing and
+    // indexOf to find the presence in the array
   },
 
   groceryList() {
@@ -230,28 +238,30 @@ const cakePrompts = {
     //    ...etc
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = cakes.reduce((acc, cake) => {
+      cake.toppings.reduce((arr, topping) => {
+        if (arr[topping]) {
+          arr[topping]++;
+        } else {
+          arr[topping] = 1;
+        }
+        return arr;
+      }, acc);
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function twice for the array traversing only once
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: classrooms from ./datasets/classrooms
@@ -265,11 +275,11 @@ const classPrompts = {
     //   { roomLetter: 'G', program: 'FE', capacity: 29 }
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = classrooms.filter(classroom => classroom.program === 'FE');
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the filter function for filtering array
   },
 
   totalCapacities() {
@@ -280,21 +290,36 @@ const classPrompts = {
     //   beCapacity: 96
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = classrooms.reduce((acc, classroom) => {
+      if (classroom.program === 'FE') {
+        if (!acc.feCapacity) {
+          acc.feCapacity = 0;
+        }
+        acc.feCapacity += classroom.capacity;
+      } else {
+        if (!acc.beCapacity) {
+          acc.beCapacity = 0;
+        }
+        acc.beCapacity += classroom.capacity;
+      }
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   sortByCapacity() {
     // Return the array of classrooms sorted by their capacity (least capacity to greatest)
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = classrooms.sort((a, b) => {
+      return a.capacity - b.capacity;
+    });
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the sort function to sort array
   }
 };
 
@@ -317,26 +342,36 @@ const bookPrompts = {
     //   'Catch-22', 'Treasure Island']
 
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = books.reduce((acc, book) => {
+      if (book.genre !== 'Horror' && book.genre !== 'True Crime') {
+        acc.push(book.title);
+      }
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
 
   },
   getNewBooks() {
     // return an array of objects containing all books that were
-    // published in the 90's and 00's. Inlucde the title and the year Eg:
+    // published in the 90's and 00's. Include the title and the year Eg:
 
     // [{ title: 'Harry Potter and the Sorcerer\'s Stone', year: 1997 },
     //  { title: 'Life of Pi', year: 2001 },
     //  { title: 'The Curious Incident of the Dog in the Night-Time', year: 2003 }]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = books.reduce((acc, book) => {
+      if (book.published > 1989 && book.published < 2010) {
+        acc.push({title: book.title, year: book.published});
+      }
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   }
 
 };
@@ -355,11 +390,14 @@ const weatherPrompts = {
     // return an array of all the average temperatures. Eg:
     // [ 40, 40, 44.5, 43.5, 57, 35, 65.5, 62, 14, 46.5 ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = weather.reduce((acc, obj) => {
+      acc.push((obj.temperature.high + obj.temperature.low) / 2);
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   findSunnySpots() {
@@ -369,11 +407,16 @@ const weatherPrompts = {
     // 'New Orleans, Louisiana is sunny.',
     // 'Raleigh, North Carolina is mostly sunny.' ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = weather.reduce((acc, obj) => {
+      if (obj.type.includes('sunny')) {
+        acc.push(`${obj.location} is ${obj.type}.`);
+      }
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing only once
   },
 
   findHighestHumidity() {
@@ -385,11 +428,15 @@ const weatherPrompts = {
     //   temperature: { high: 49, low: 38 }
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = weather.sort((a, b) => b.humidity - a.humidity)[0];
+    /*weather.reduce((prevObj, obj) => {
+    return
+  });*/
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the sort function to sort the array
+    // and then getting first element of array
 
   }
 };
@@ -412,11 +459,30 @@ const nationalParksPrompts = {
     //   parksVisited: ["Rocky Mountain", "Acadia", "Zion"]
     //}
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = nationalParks.reduce((acc, park) => {
+      /*      if (park.visited) {
+              if (!acc.parksToVisit) {
+                acc.parksToVisit = [];
+              }
+              acc.parksToVisit.push(park.name);
+            } else {
+              if (!acc.parksVisited) {
+                acc.parksVisited = [];
+              }
+              acc.parksVisited.push(park.name);
+            }*/
+      const visit = park.visited ? 'parksVisited' : 'parksToVisit';
+      if (!acc[visit]) {
+        acc[visit] = [];
+      }
+      acc[visit].push(park.name);
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
+    // refactored code
   },
 
   getParkInEachState() {
@@ -429,11 +495,14 @@ const nationalParksPrompts = {
     // { Florida: 'Everglades' } ]
 
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = nationalParks.reduce((arr, park) => {
+      arr.push({[park.location]: park.name});
+      return arr;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   getParkActivities() {
@@ -452,25 +521,28 @@ const nationalParksPrompts = {
     //   'backpacking',
     //   'rock climbing' ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = nationalParks.reduce((arr, park) => {
+      park.activities.reduce((acc, activity) => {
+        if (!acc.includes(activity)) {
+          acc.push(activity);
+        }
+        return acc;
+      }, arr);
+      return arr;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function twice for the array traversing only once
   }
 };
 
 
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: breweries from ./datasets/breweries
@@ -479,11 +551,11 @@ const breweryPrompts = {
     // Return the total beer count of all beers for every brewery e.g.
     // 40
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = breweries.reduce((sum, brewery) => sum += brewery.beers.length, 0);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   getBreweryBeerCount() {
@@ -495,11 +567,14 @@ const breweryPrompts = {
     // ...etc.
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = breweries.reduce((arr, brewery) => {
+      arr.push({name: brewery.name, beerCount: brewery.beers.length});
+      return arr;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   findHighestAbvBeer() {
@@ -507,19 +582,18 @@ const breweryPrompts = {
     // e.g.
     // { name: 'Barrel Aged Nature\'s Sweater', type: 'Barley Wine', abv: 10.9, ibu: 40 }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = breweries.reduce((acc, brewery) => {
+      let beer = brewery.beers.sort((a, b) => b.abv - a.abv)[0];
+      return acc.abv ? acc.abv > beer.abv ? acc : beer : beer;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce and sort functions for the array traversing only once
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -527,19 +601,11 @@ const breweryPrompts = {
 // ---------------------------------------------------------------------------
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DOUBLE DATASETS
@@ -555,11 +621,18 @@ const turingPrompts = {
     //  { name: 'Robbie', studentCount: 18 }
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = instructors.reduce((arr, instructor) => {
+      arr.push({
+        name: instructor.name,
+        studentCount: cohorts.find(cohort => cohort.module === instructor.module).studentCount
+      });
+      return arr;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the instructors array traversing and
+    // the find functions to search for studentCount in the cohorts array
   },
 
   studentsPerInstructor() {
@@ -568,12 +641,24 @@ const turingPrompts = {
     // cohort1806: 9,
     // cohort1804: 10.5
     // }
+    const instructPerMod = instructors.reduce((acc, instructor) => {
+      if (!acc[instructor.module]) {
+        acc[instructor.module] = 1;
+      } else {
+        acc[instructor.module]++;
+      }
+      return acc;
+    }, {});
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = cohorts.reduce((acc, obj) => {
+      acc[`cohort${obj.cohort}`] = obj.studentCount / instructPerMod[obj.module];
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for creating an object with the number of instructors and
+    // getting the result as students per instructor
   },
 
   modulesPerTeacher() {
@@ -591,11 +676,40 @@ const turingPrompts = {
     //     Will: [1, 2, 3, 4]
     //   }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const modulesPerSubject = cohorts.reduce((acc, cohort) => {
+      cohort.curriculum.reduce((obj, subject) => {
+        if (!obj[subject]) {
+          obj[subject] = [];
+        }
+        if (!obj[subject].includes(cohort.module)) {
+          obj[subject].push(cohort.module);
+        }
+        return obj;
+      }, acc);
+      return acc;
+    }, {});
+
+    const result = instructors.reduce((acc, obj) => {
+      if (!acc[obj.name]) {
+        acc[obj.name] = [];
+      }
+      acc[obj.name] = obj.teaches.reduce((arr, skill) => {
+        modulesPerSubject[skill].reduce((mArr, nextEl) => {
+          if (!mArr.includes(nextEl)) {
+            mArr.push(nextEl);
+          }
+          return mArr;
+        }, arr);
+        return arr.sort();
+      }, []);
+      return acc;
+    }, {});
+
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for create object modulesPerSubject and
+    //  then using it in another reduce function
   },
 
   curriculumPerTeacher() {
@@ -608,28 +722,29 @@ const turingPrompts = {
     //   recursion: [ 'Pam', 'Leta' ]
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = instructors.reduce((acc, instructor) => {
+      instructor.teaches.reduce((acc, skill) => {
+        if (!acc[skill]) {
+          acc[skill] = [];
+        }
+        acc[skill].push(instructor.name);
+        return acc;
+      }, acc);
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: bosses, sidekicks from ./datasets/bosses
@@ -643,28 +758,29 @@ const bossPrompts = {
     //   { bossName: 'Scar', sidekickLoyalty: 16 }
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = sidekicks.reduce((acc, sidekick) => {
+      let index = acc.findIndex(obj => obj.bossName === sidekick.boss);
+      if (index > -1) {
+        acc[index].sidekickLoyalty += sidekick.loyaltyToBoss;
+      } else {
+        acc.push({bossName: sidekick.boss, sidekickLoyalty: sidekick.loyaltyToBoss});
+      }
+      return acc;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing and
+    // then findIndex to find index of the object in the array
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: constellations, stars } from ./datasets/astronomy
@@ -685,11 +801,22 @@ const astronomyPrompts = {
     //     color: 'red' }
     // ]
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
-    return result;
+    const result = Object.keys(constellations).reduce((arr, key) => {
+      constellations[key].stars.reduce((acc, name) => {
+        let find = stars.find(star => star.name === name);
+        if (find) {
+          acc.push(find);
+        }
+        return acc;
+      }, arr);
+      return arr;
+    }, []);
+    return result.sort().reverse();
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using Object.keys function for get array
+    // with all the own enumerable properties' names ("keys") of an object constellations
+    // using the reduce function for the array traversing
   },
 
   starsByColor() {
@@ -703,11 +830,18 @@ const astronomyPrompts = {
     //   red: [{obj}]
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = stars.reduce((acc, star) => {
+      if (!acc[star.color]) {
+        acc[star.color] = [];
+      }
+      acc[star.color].push(star);
+      return acc;
+    }, {});
+
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // using the reduce function for the array traversing
   },
 
   constellationsStarsExistIn() {
@@ -725,28 +859,29 @@ const astronomyPrompts = {
     //    "The Little Dipper" ]
 
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = stars
+      .sort((a, b) => a.visualMagnitude - b.visualMagnitude)
+      .reduce((acc, star) => {
+        let item = star.constellation;
+        if (item) {
+          acc.push(item);
+        }
+        return acc;
+      }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // First using the sort function for returning the data in ascending order and then
+    // the reduce function for the array traversing
   }
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: charaters, weapons from ./datasets/ultima
@@ -756,11 +891,17 @@ const ultimaPrompts = {
     // Return the sum of the amount of damage for all the weapons that our characters can use
     // Answer => 113
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = characters.reduce((amount, nextCharacter) => {
+      amount += nextCharacter.weapons.reduce((acc, nextWeapon) => {
+        acc += weapons[nextWeapon].damage;
+        return acc;
+      }, 0);
+      return amount;
+    }, 0);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Using the reduce function twice for the array traversing only once
   },
 
   charactersByTotal() {
@@ -768,28 +909,33 @@ const ultimaPrompts = {
     // Return the sum damage and total range for each character as an object.
     // ex: [ { Avatar: { damage: 27, range: 24 }, { Iolo: {...}, ...}
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = characters.reduce((arr, nextCharacter) => {
+      const paramsObj =
+        nextCharacter.weapons.reduce((acc, weapon) => {
+          if (!acc['damage']) {
+            acc['damage'] = 0;
+            acc['range'] = 0;
+          }
+          acc['damage'] += weapons[weapon].damage;
+          acc['range'] += weapons[weapon].range;
+          return acc;
+        }, {});
+      arr.push({[nextCharacter.name]: paramsObj});
+      return arr;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Using the reduce function twice for the array traversing only once
   },
 };
 
 
-
-
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-
-
-
 
 
 // DATASET: dinosaurs, humans, movies from ./datasets/dinosaurs
@@ -805,11 +951,21 @@ const dinosaurPrompts = {
     //   'Jurassic World: Fallen Kingdom': 18
     // }
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = movies.reduce((acc, movie) => {
+      const number =
+        movie.dinos.reduce((sum, dino) => {
+          if (dinosaurs[dino].isAwesome) {
+            sum++;
+          }
+          return sum;
+        }, 0);
+      acc[movie.title] = number;
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Using the reduce function twice for the array traversing only once
   },
 
   averageAgePerMovie() {
@@ -838,16 +994,32 @@ const dinosaurPrompts = {
       }
     */
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const result = movies.reduce((acc, movie) => {
+      const ageSum = movie.cast.reduce((sum, actor) => {
+        sum += movie.yearReleased - humans[actor].yearBorn;
+        return sum;
+      }, 0);
+      if (!acc[movie.director]) {
+        acc[movie.director] = {};
+      }
+      if (!acc[movie.director][movie.title]) {
+        acc[movie.director][movie.title] = {};
+      }
+      acc[movie.director][movie.title] = Math.floor(ageSum / movie.cast.length);
+      return acc;
+    }, {});
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Using the reduce function twice for the array traversing only once
+    // Using the Math.flor function for return an integer number.
   },
 
   uncastActors() {
     /*
-    Return an array of objects that contain the names of humans who have not been cast in a Jurassic Park movie (yet), their nationality, and their imdbStarMeterRating. The object in the array should be sorted alphabetically by nationality.
+    Return an array of objects that contain the names of humans who have not been cast in a Jurassic Park movie (yet)
+    , their nationality, and their imdbStarMeterRating.
+    The object in the array should be sorted alphabetically by nationality.
 
     e.g.
       [{
@@ -871,16 +1043,48 @@ const dinosaurPrompts = {
       }]
     */
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const cast = movies.reduce((arr, movie) => {
+      movie.cast.reduce((arr, name) => {
+        if (!arr.includes(name)) {
+          arr.push(name);
+        }
+        return arr;
+      }, arr);
+      return arr;
+    }, []);
+
+    const result = Object.keys(humans).reduce((arr, name) => {
+      if (!cast.includes(name)) {
+        arr.push({
+          name: name,
+          nationality: humans[name].nationality,
+          imdbStarMeterRating: humans[name].imdbStarMeterRating
+        });
+      }
+      return arr;
+    }, []);
+    result.sort((a, b) => {
+      if (a.nationality > b.nationality) {
+        return 1;
+      }
+      if (a.nationality < b.nationality) {
+        return -1;
+      }
+      return a.imdbStarMeterRating - b.imdbStarMeterRating;
+    });
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Using the reduce function for getting an array of unique names of humans
+    // who have been cast in a Jurassic Park movie
+    // then using the reduce function again for comparing all humans with the humans
+    // who have been cast in a Jurassic Park movie and returning sorted an array of human objects
   },
 
   actorsAgesInMovies() {
     /*
-    Return an array of objects for each human and the age(s) they were in the movie(s) they were cast in, as an array of age(s). Only include humans who were cast in at least one movie.
+    Return an array of objects for each human and the age(s) they were in the movie(s) they were cast in,
+     as an array of age(s). Only include humans who were cast in at least one movie.
 
     e.g.
     [ { name: 'Sam Neill', ages: [ 46, 54 ] },
@@ -894,11 +1098,26 @@ const dinosaurPrompts = {
       { name: 'Bryce Dallas Howard', ages: [ 34, 37 ] } ]
     */
 
-    const result = 'REPLACE WITH YOUR RESULT HERE';
+    const castAge = movies.reduce((acc, movie) => {
+      movie.cast.reduce((acc, name) => {
+        if (!acc[name]) {
+          acc[name] = [];
+        }
+        acc[name].push(movie.yearReleased - humans[name].yearBorn);
+        return acc;
+      }, acc);
+      return acc;
+    }, {});
+
+    const result = Object.keys(castAge).reduce((arr, name) => {
+      arr.push({name: name, ages: castAge[name]});
+      return arr;
+    }, []);
     return result;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Using the reduce function for getting an object of human who where cast in at least one movie, and
+    // then using the reduce function with Object.keys for getting the result.
   }
 };
 
